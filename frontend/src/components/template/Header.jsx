@@ -779,7 +779,7 @@ export default function Header({
             sx={{
               py: 1.25,
               px: 2,
-              gap: 1.5,
+              gap: 0.2,
               borderRadius: '10px',
               mx: 0.5,
               my: 0.25,
@@ -788,11 +788,17 @@ export default function Header({
               },
             }}
           >
-            <ListItemIcon sx={{ minWidth: 40 }}>
-              <LogoutIcon sx={{ color: 'text.secondary', fontSize: 22 }} />
+            <ListItemIcon sx={{ minWidth: 24 }}>
+              <LogoutIcon
+                sx={{
+                  color: 'text.secondary',
+                  fontSize: 22,
+                  transform: 'scaleX(-1)',
+                }}
+              />
             </ListItemIcon>
             <ListItemText
-              primary="Back Pilar Group"
+              primary="Back Pilargroup"
               primaryTypographyProps={{
                 fontSize: '0.95rem',
                 fontWeight: 500,
