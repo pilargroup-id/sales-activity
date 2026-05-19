@@ -11,29 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # -------------------------
-      # 1. Checkout
-      # -------------------------
       - name: Checkout source
         uses: actions/checkout@v4
 
-      # -------------------------
-      # 2. Setup Node & build frontend
-      # -------------------------
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      # - name: Install dependencies & build frontend
-      #   working-directory: frontend
-      #   run: |
-      #     npm install
-      #     npm run build
-
-      # -------------------------
-      # 3. Setup SSH key
-      # -------------------------
       - name: Setup SSH key
         env:
           SSH_PRIVATE_KEY: ${{ secrets.GCP_SSH_KEY }}
@@ -43,33 +23,7 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           ssh-keyscan -H ${{ secrets.GCP_HOST }} >> ~/.ssh/known_hosts
 
-      # -------------------------
-      # 4. Pull latest code di VM
-      # -------------------------
-      - name: Pull latest code on VM
-        run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} "
-            set -e
-            cd /var/www/touchpoint
-            echo '>> Git pull'
-            git pull origin main
-          "
-
-      # -------------------------
-      # 5. Upload hasil build frontend ke VM
-      # -------------------------
-      - name: Upload frontend build to VM
-        run: |
-          ssh -i ~/.ssh/deploy_key ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
-            "rm -rf /var/www/touchpoint/frontend/dist/*"
-          
-          scp -i ~/.ssh/deploy_key -r frontend/dist/* \
-            ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }}:/var/www/touchpoint/frontend/dist/
-
-      # -------------------------
-      # 6. Install PHP deps & cache di VM
-      # -------------------------
-      - name: Finalize deploy on VM
+      - name: Deploy on VM
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} "
             set -e
