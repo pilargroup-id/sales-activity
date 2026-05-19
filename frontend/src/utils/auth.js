@@ -46,11 +46,25 @@ export const consumeTokenFromUrl = async () => {
   if (token) {
     localStorage.setItem('token', token);
 
+    // Set token_cv DULU sebelum apapun
+    try {
+      const payload = JSON.parse(
+        atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+      );
+      if (payload.cv !== undefined) {
+        localStorage.setItem('token_cv', String(payload.cv));
+      }
+    } catch {
+      // ignore
+    }
+
+    // Strip token dari URL
     params.delete('token');
     const newSearch = params.toString();
     const newUrl = window.location.pathname + (newSearch ? `?${newSearch}` : '');
     window.history.replaceState({}, '', newUrl);
 
+    // Baru fetch /me
     try {
       const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/me`, {
         headers: {
@@ -62,19 +76,12 @@ export const consumeTokenFromUrl = async () => {
         const user = await res.json();
         localStorage.setItem('sales', JSON.stringify(user));
         notifyAuthUpdated();
+      } else {
+        const errBody = await res.text();
+        console.error('[auth] /me failed', res.status, errBody);
       }
     } catch (e) {
-      console.error('Failed to fetch user after token handoff', e);
-    }
-
-    // Extract cv dari JWT dan simpan
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-      if (payload.cv !== undefined) {
-        localStorage.setItem('token_cv', String(payload.cv));
-      }
-    } catch {
-      // ignore
+      console.error('[auth] /me fetch error', e);
     }
 
     return token;

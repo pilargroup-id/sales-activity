@@ -54,8 +54,8 @@ export function useSessionGuard() {
             return;
           }
 
-          const storedCv = getStoredCv();
           if (data.token_version !== undefined) {
+            const storedCv = getStoredCv();
             if (storedCv === null || Number(storedCv) !== Number(data.token_version)) {
               handleExpired();
             }
