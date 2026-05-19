@@ -28,8 +28,11 @@ class SalesAuth
                 'sales_name'        => $payload->get('name'),
                 'user_id'           => $payload->get('sub'),
                 'username'          => $payload->get('username'),
-                'department'        => $payload->get('department'),
-                'cv'                => $payload->get('cv'),
+                'department'        => $payload->get('primary_dept_name'),
+                'department_id'     => $payload->get('primary_dept_id'),
+                'company_id'        => $payload->get('primary_company_id'),
+                'departments'       => $payload->get('departments'), // full list kalau butuh
+                'companies'         => $payload->get('companies'),
             ]);
 
         } catch (TokenExpiredException $e) {
