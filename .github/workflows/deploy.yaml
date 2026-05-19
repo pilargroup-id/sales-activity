@@ -60,6 +60,9 @@ jobs:
       # -------------------------
       - name: Upload frontend build to VM
         run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} \
+            "rm -rf /var/www/touchpoint/frontend/dist/*"
+          
           scp -i ~/.ssh/deploy_key -r frontend/dist/* \
             ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }}:/var/www/touchpoint/frontend/dist/
 
