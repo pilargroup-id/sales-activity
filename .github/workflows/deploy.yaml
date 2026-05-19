@@ -25,11 +25,11 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install dependencies & build frontend
-        working-directory: frontend
-        run: |
-          npm install
-          npm run build
+      # - name: Install dependencies & build frontend
+      #   working-directory: frontend
+      #   run: |
+      #     npm install
+      #     npm run build
 
       # -------------------------
       # 3. Setup SSH key
@@ -69,22 +69,28 @@ jobs:
       # -------------------------
       # 6. Install PHP deps & cache di VM
       # -------------------------
-      - name: Finalize backend deploy on VM
+      - name: Finalize deploy on VM
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.GCP_USER }}@${{ secrets.GCP_HOST }} "
             set -e
-            cd /var/www/touchpoint/backend
+            cd /var/www/touchpoint
 
-            echo '>> Composer install'
+            echo '>> Git pull'
+            git pull origin main
+
+            echo '>> Build frontend'
+            cd frontend
+            npm install
+            npm run build
+
+            echo '>> Backend'
+            cd ../backend
             composer install --no-dev --optimize-autoloader --no-interaction
-
-            echo '>> Artisan cache'
             php artisan config:cache
             php artisan route:cache
             php artisan view:cache
 
             echo '>> Reload nginx'
             sudo systemctl reload nginx
-
             echo '>> Deploy selesai'
           "
